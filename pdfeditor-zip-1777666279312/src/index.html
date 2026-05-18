@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' app: data: blob: 'unsafe-inline' 'unsafe-eval'">
+  <title>PDF Editor</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ═══════════════ TITLEBAR ═══════════════ -->
+<div id="titlebar">
+  <div id="titlebar-drag">
+    <span id="app-logo">⬡ PDF Editor</span>
+    <span id="current-file-name">Niciun fișier deschis</span>
+  </div>
+  <div id="titlebar-controls">
+    <button id="btn-minimize" title="Minimizează">─</button>
+    <button id="btn-maximize" title="Maximizează">□</button>
+    <button id="btn-close"    title="Închide">✕</button>
+  </div>
+</div>
+
+<!-- ═══════════════ TOOLBAR ═══════════════ -->
+<div id="toolbar">
+  <button class="tb-btn" id="btn-new"     title="PDF nou">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    <span>Nou</span>
+  </button>
+  <button class="tb-btn" id="btn-open"    title="Deschide fișier">
+    <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+    <span>Deschide</span>
+  </button>
+  <button class="tb-btn" id="btn-save"    title="Salvează PDF" disabled>
+    <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+    <span>Salvează</span>
+  </button>
+  <button class="tb-btn" id="btn-close-doc" title="Închide documentul (Ctrl+W)" disabled>
+    <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    <span>Închide</span>
+  </button>
+  <div class="tb-sep"></div>
+  <button class="tb-btn" id="btn-convert" title="Convertește în PDF">
+    <svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+    <span>Convertește</span>
+  </button>
+  <div class="tb-sep"></div>
+  <button class="tb-btn tool-btn" id="btn-select"   title="Selectare text" disabled>
+    <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    <span>Selectare</span>
+  </button>
+  <button class="tb-btn tool-btn" id="btn-add-text"  title="Adaugă text" disabled>
+    <svg viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4"  x2="12" y2="20"/></svg>
+    <span>Text</span>
+  </button>
+  <button class="tb-btn tool-btn" id="btn-add-img"   title="Adaugă imagine" disabled>
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+    <span>Imagine</span>
+  </button>
+  <div class="tb-sep"></div>
+  <div id="zoom-group">
+    <button id="btn-zoom-out" title="Micșorează" disabled>−</button>
+    <span id="zoom-label">100%</span>
+    <button id="btn-zoom-in"  title="Mărește"    disabled>+</button>
+    <button id="btn-zoom-fit" title="Potrivit"   disabled>Fit</button>
+  </div>
+  <div class="tb-sep" style="flex:1; background:transparent; border:none"></div>
+  <button class="tb-btn" id="btn-ai-toggle" title="Panoul AI">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+    <span>AI Panel</span>
+  </button>
+  <button class="tb-btn" id="btn-settings"  title="Setări">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <span>Setări</span>
+  </button>
+</div>
+
+<!-- DOC ACTION BAR (accept/reject AI result) -->
+<div id="doc-action-bar" class="hidden">
+  <span id="doc-action-msg">Previzualizare</span>
+  <button id="btn-doc-accept">✓ Salvează</button>
+  <button id="btn-doc-reject">✕ Revino la original</button>
+</div>
+
+<!-- ═══════════════ MAIN LAYOUT ═══════════════ -->
+<div id="main-layout">
+
+  <!-- Thumbnails sidebar -->
+  <div id="sidebar-thumbs">
+    <div id="thumbs-header">Pagini</div>
+    <div id="thumbs-list"></div>
+  </div>
+
+  <!-- PDF area -->
+  <div id="pdf-area">
+
+    <!-- Home screen -->
+    <div id="home-screen">
+      <div class="home-logo">⬡</div>
+      <h1>PDF Editor</h1>
+      <p class="home-sub">Crează, editează și analizează documente cu AI</p>
+      <div class="home-actions">
+        <button class="home-card" id="home-new">
+          <span class="card-icon">📄</span>
+          <span class="card-title">PDF Nou</span>
+          <span class="card-desc">Crează un document gol</span>
+        </button>
+        <button class="home-card" id="home-open">
+          <span class="card-icon">📂</span>
+          <span class="card-title">Deschide</span>
+          <span class="card-desc">Deschide un PDF existent</span>
+        </button>
+        <button class="home-card" id="home-convert">
+          <span class="card-icon">🔄</span>
+          <span class="card-title">Convertește</span>
+          <span class="card-desc">Word, Text, HTML → PDF</span>
+        </button>
+      </div>
+      <div id="recent-section">
+        <h3>Fișiere recente</h3>
+        <div id="recent-list"></div>
+      </div>
+    </div>
+
+    <!-- PDF viewer -->
+    <div id="pdf-viewer" class="hidden">
+      <div id="pages-wrap"></div>
+    </div>
+
+  </div>
+
+  <!-- AI Panel -->
+  <div id="ai-panel" class="collapsed">
+    <div id="ai-header">
+      <div id="ai-tabs">
+        <button class="ai-tab active" data-provider="claude">Claude</button>
+        <button class="ai-tab"        data-provider="gemini">Gemini</button>
+      </div>
+      <button id="btn-ai-close" title="Închide panoul AI">✕</button>
+    </div>
+
+    <div id="ai-doc-info">
+      <span id="ai-doc-label">Niciun document activ</span>
+    </div>
+
+    <div id="ai-quick-btns">
+      <button class="ai-quick" data-action="summarize">📋 Rezumat</button>
+      <button class="ai-quick" data-action="translate">🌐 Traduce</button>
+      <button class="ai-quick" data-action="analyze">🔍 Analizează</button>
+      <button class="ai-quick" data-action="improve">✨ Îmbunătățește</button>
+      <button class="ai-quick" data-action="ideas">💡 Idei</button>
+      <button class="ai-quick" data-action="key-points">🎯 Puncte cheie</button>
+    </div>
+
+    <div id="ai-messages"></div>
+
+    <div id="ai-input-area">
+      <textarea id="ai-input" placeholder="Scrie un mesaj sau selectează text din document..."></textarea>
+      <div id="ai-input-btns">
+        <button id="btn-ai-clear" title="Șterge conversația">🗑</button>
+        <button id="btn-ai-send">Trimite</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════ STATUS BAR ═══════════════ -->
+<div id="statusbar">
+  <span id="st-file">Niciun fișier</span>
+  <span id="st-pages"></span>
+  <span id="st-zoom"></span>
+  <span id="st-msg"></span>
+</div>
+
+<!-- ═══════════════ CONTEXT MENU ═══════════════ -->
+<div id="ctx-menu" class="hidden">
+  <ul id="ctx-list"></ul>
+</div>
+
+<!-- ═══════════════ MODALS ═══════════════ -->
+<div id="modal-overlay" class="hidden">
+
+  <!-- Settings modal -->
+  <div id="modal-settings" class="modal hidden">
+    <div class="modal-header">
+      <h2>Setări</h2>
+      <button class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Claude (Anthropic) API Key</label>
+        <input type="password" id="set-claude-key" placeholder="sk-ant-...">
+        <small>Obține de la console.anthropic.com</small>
+      </div>
+      <div class="form-group">
+        <label>Google Gemini API Key</label>
+        <input type="password" id="set-gemini-key" placeholder="AIza...">
+        <small>Obține de la aistudio.google.com</small>
+      </div>
+      <div class="form-group">
+        <label>Limbă implicită pentru traducere</label>
+        <select id="set-language">
+          <option value="ro">Română</option>
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+          <option value="es">Español</option>
+          <option value="it">Italiano</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Integrare Windows</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+          <button id="btn-register-windows" class="btn-secondary">📌 Adaugă la "Deschide cu..."</button>
+          <button id="btn-set-default" class="btn-secondary">⭐ Setează ca implicit...</button>
+        </div>
+        <small>Înregistrează aplicația pentru PDF, DOCX, TXT, MD, HTML în meniul contextual Windows</small>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="btn-settings-save" class="btn-primary">Salvează</button>
+      <button class="btn-cancel modal-close-btn">Anulează</button>
+    </div>
+  </div>
+
+  <!-- Convert modal -->
+  <div id="modal-convert" class="modal hidden">
+    <div class="modal-header">
+      <h2>Convertire în PDF</h2>
+      <button class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="drop-zone">
+        <div class="drop-icon">📁</div>
+        <p>Trage fișierul aici</p>
+        <p>sau</p>
+        <button id="btn-browse-convert" class="btn-secondary">Selectează fișier</button>
+        <p class="drop-formats">Word (.docx), Text (.txt), Markdown (.md), HTML (.html)</p>
+      </div>
+      <div id="convert-progress" class="hidden">
+        <div class="progress-spinner"></div>
+        <span id="convert-status">Se convertește...</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel modal-close-btn">Anulează</button>
+    </div>
+  </div>
+
+  <!-- New PDF modal -->
+  <div id="modal-new" class="modal hidden">
+    <div class="modal-header">
+      <h2>PDF Nou</h2>
+      <button class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Conținut inițial (opțional)</label>
+        <textarea id="new-pdf-text" placeholder="Scrie textul pentru noul PDF..." rows="8"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Dimensiune font</label>
+        <select id="new-pdf-size">
+          <option value="10">10pt</option>
+          <option value="11" selected>11pt</option>
+          <option value="12">12pt</option>
+          <option value="14">14pt</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="btn-new-create" class="btn-primary">Creează PDF</button>
+      <button class="btn-cancel modal-close-btn">Anulează</button>
+    </div>
+  </div>
+
+  <!-- Translate modal -->
+  <div id="modal-translate" class="modal hidden">
+    <div class="modal-header">
+      <h2>Traducere document</h2>
+      <button class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Traduce în</label>
+        <select id="trans-lang">
+          <option value="română">Română</option>
+          <option value="engleză">Engleză</option>
+          <option value="franceză">Franceză</option>
+          <option value="germană">Germană</option>
+          <option value="spaniolă">Spaniolă</option>
+          <option value="italiană">Italiană</option>
+          <option value="portugheză">Portugheză</option>
+          <option value="japoneză">Japoneză</option>
+          <option value="chineză">Chineză</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>AI</label>
+        <select id="trans-provider">
+          <option value="claude">Claude</option>
+          <option value="gemini">Gemini</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="btn-translate-go" class="btn-primary">Traduce</button>
+      <button class="btn-cancel modal-close-btn">Anulează</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- pdf.js încărcat via protocol app:// -->
+<script src="app://node_modules/pdfjs-dist/build/pdf.js"></script>
+<script src="renderer.js"></script>
+</body>
+</html>

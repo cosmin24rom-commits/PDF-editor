@@ -1,0 +1,38 @@
+{
+  "name": "pdf-editor",
+  "version": "1.0.0",
+  "description": "PDF Editor 100% Portabil cu AI Gemini si Claude",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win --x64"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "@google/generative-ai": "^0.21.0",
+    "mammoth": "^1.8.0",
+    "marked": "^14.1.3",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "3.11.174"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.pdfeditor.portable",
+    "productName": "PDF Editor",
+    "directories": { "output": "dist" },
+    "win": {
+      "target": "portable",
+      "artifactName": "PDF-Editor.exe"
+    },
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/pdfjs-dist/**",
+      "node_modules/mammoth/**",
+      "**/*.node"
+    ],
+    "files": ["**/*", "!dist/**", "!.git/**", "!*.md", "!start.bat", "!node_modules/electron/**"]
+  }
+}
